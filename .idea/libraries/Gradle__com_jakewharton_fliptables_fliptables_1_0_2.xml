@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: com.jakewharton.fliptables:fliptables:1.0.2">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jakewharton.fliptables/fliptables/1.0.2/797b709114c107947e4796bdb506ab0e62eaf5ce/fliptables-1.0.2.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jakewharton.fliptables/fliptables/1.0.2/132cc819e2e93bbd91ae93453bac786640805213/fliptables-1.0.2-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
