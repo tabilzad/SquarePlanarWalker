@@ -59,19 +59,18 @@ class Simulation(
 
 
     fun display(list: IntArray, time: Double) {
-       // val list = collection.toIntArray()
 
         println("Calculating averages...")
         val mean = list.average()
         println("Walk Length: $mean")
         //val error = collection.standardDeviation() / Math.sqrt(list.size.toDouble())
         val error = list.findDeviation(mean) / Math.sqrt(list.size.toDouble())
-        //println("Error: " + error * 100 + "%")
+        println("Error: $error%")
+        println("Percentage: ${error*100}%")
         println("(+/-) " + error * 1.96)
         println("Samples:" + list.size)
         println("Probability:$probability")
         println("Lattice:$lattice")
-
         println("Time: " + time
                 + " seconds")
         Result(
@@ -104,8 +103,10 @@ class Simulation(
     }
 
     fun IntArray.findDeviation(mean: Double): Double {
-        var squareSum = 0.0
-        this.indices.forEach { i -> squareSum += Math.pow((this[i] - mean), 2.0) }
+       // var squareSum = 0.0
+        val squareSum = this.fold(0.0) { acc, i ->
+            acc + Math.pow(i-mean, 2.0)
+        }
         return Math.sqrt(squareSum / (this.size - 1))
     }
 
