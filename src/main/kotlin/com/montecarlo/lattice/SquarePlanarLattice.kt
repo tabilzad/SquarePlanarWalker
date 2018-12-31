@@ -8,10 +8,10 @@ enum class SquarePlanarLattice(override val centerPoint: Int,
                                override val trap2: Int = 0) : Lattice {
     Square_3(3),
     Square_5(5),
-    Square_7(7);
-   // Square_9(9),
-   // Square_11(11);
-   // Square_13(13),
+    Square_7(7),
+    Square_9(9),
+    Square_11(11);
+   //Square_13(13),
   //  Square_15(15),
    // Square_17(17);
 

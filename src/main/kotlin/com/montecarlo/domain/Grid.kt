@@ -45,6 +45,7 @@ class Grid(var Grid_size: Lattice, var Iterations: Int, var pb: Double) {
         }
     }
 
+
     fun run_sim_2_3D() {
         (1..Iterations).forEach {
             var st = 0

@@ -4,9 +4,10 @@ import com.montecarlo.domain.Grid
 import com.montecarlo.domain.Result
 import com.montecarlo.lattice.Lattice
 import kotlinx.coroutines.*
-import org.magicwerk.brownies.collections.helper.BigLists
-import org.nield.kotlinstatistics.standardDeviation
-import java.util.*
+import org.nield.kotlinstatistics.descriptiveStatistics
+import org.nield.kotlinstatistics.geometricMean
+import java.time.LocalDate.*
+import java.time.format.DateTimeFormatter.*
 import kotlin.system.measureTimeMillis
 
 class Simulation(
@@ -17,22 +18,27 @@ class Simulation(
 ) {
     //var gList = Collections.synchronizedList(ArrayList<Int>(1_000_100_000))
     fun start() {
-        var gList = IntArray(1)
+        val gList = IntArray(iters * 8)
+        var idx = 0
         val time = measureTimeMillis {
-            gList = runBlocking {
+            runBlocking {
                 (1..threads).map { i ->
                     GlobalScope.async(Dispatchers.IO) {
-                        val g: Grid? = Grid(lattice, iters, probability)
-                        g!!.run_sim_3D()
+                        val g = Grid(lattice, iters, probability)
+                        g.run_sim2_2D()
                         g.list
                     }
-                }.awaitAll().reduce { acc, ints ->
-                    acc.plus(ints)
+                }.forEach {
+                    val res = it.await()
+                    res.copyInto(
+                            destination = gList,
+                            destinationOffset = idx)
+                    idx += res.size
                 }
             }
+
         }
         display(gList, time / 1000.0)
-      //  gList = null
     }
 
     private fun Result.writeToDB() {
@@ -52,8 +58,9 @@ class Simulation(
                     " );").execute()
             db.prepareStatement("INSERT INTO Data(lattice, samples, walk_length, error, conf_interval, time, s, timestamp, type)" +
                     " VALUES (\"$lattice\", \"$samples\", \"$walk_length\", \"$error\"," +
-                    " \"$conf_interval\", \"$time\", \"$mortality\", \"${java.time.LocalDate.now().format(java.time.format.DateTimeFormatter.ISO_LOCAL_DATE)}\", \"$type\")").executeUpdate()
+                    " \"$conf_interval\", \"$time\", \"$mortality\", \"${now().format(ISO_LOCAL_DATE)}\", \"$type\")").executeUpdate()
             println("Written to DB")
+            db.close()
         }
     }
 
@@ -62,28 +69,36 @@ class Simulation(
 
         println("Calculating averages...")
         val mean = list.average()
+        System.gc()
         println("Walk Length: $mean")
-        //val error = collection.standardDeviation() / Math.sqrt(list.size.toDouble())
-        val error = list.findDeviation(mean) / Math.sqrt(list.size.toDouble())
+        val error = list.descriptiveStatistics.standardDeviation / Math.sqrt(list.size.toDouble())
+        // val error = 0 //list.findDeviation(mean) / Math.sqrt(list.size.toDouble())
         println("Error: $error%")
-        println("Percentage: ${error*100}%")
+        println("Percentage: ${error * 100}%")
         println("(+/-) " + error * 1.96)
-        println("Samples:" + list.size)
+        println("Samples:" + iters * threads)
         println("Probability:$probability")
         println("Lattice:$lattice")
         println("Time: " + time
                 + " seconds")
+
         Result(
-                lattice = "$lattice",
-                samples = list.size.toString(),
+                lattice = "2D_$lattice",
+                samples = (iters * 8).toString(),
                 walk_length = mean.toString(),
                 error = (error * 100).toBigDecimal().toPlainString().take(5),
                 conf_interval = "${error * 1.96}",
                 time = time.toString(),
                 mortality = probability,
-                type = "STOPPER"
+                type = "TEST STOPPER?"
         ).writeToDB()
         println("-------------------------------")
+    }
+
+    private fun IntArray.findDeviation(mean: Double): Double {
+        return Math.sqrt(fold(0.0) { acc, i ->
+            acc + Math.pow(i - mean, 2.0)
+        } / (this.size - 1))
     }
 
     fun mean2(list: List<Int>): Double {
@@ -102,12 +117,8 @@ class Simulation(
         return Math.sqrt(squareSum / (nums.size - 1))
     }
 
-    fun IntArray.findDeviation(mean: Double): Double {
-       // var squareSum = 0.0
-        val squareSum = this.fold(0.0) { acc, i ->
-            acc + Math.pow(i-mean, 2.0)
-        }
-        return Math.sqrt(squareSum / (this.size - 1))
+    fun finalile() {
+        println("Simulation deleted")
     }
 
 }
