@@ -1,13 +1,17 @@
 package com.montecarlo
 
-import com.montecarlo.domain.Grid
 import com.montecarlo.domain.Result
+import com.montecarlo.domain.WallGrid
 import com.montecarlo.lattice.Lattice
-import kotlinx.coroutines.*
+import com.montecarlo.lattice.SquarePlanarWallLattice
+import com.montecarlo.lattice.WallType
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.runBlocking
 import org.nield.kotlinstatistics.descriptiveStatistics
-import org.nield.kotlinstatistics.geometricMean
-import java.time.LocalDate.*
-import java.time.format.DateTimeFormatter.*
+import java.time.LocalDate.now
+import java.time.format.DateTimeFormatter.ISO_LOCAL_DATE
 import kotlin.system.measureTimeMillis
 
 class Simulation(
@@ -16,7 +20,6 @@ class Simulation(
         val iters: Int,
         val lattice: Lattice
 ) {
-    //var gList = Collections.synchronizedList(ArrayList<Int>(1_000_100_000))
     fun start() {
         val gList = IntArray(iters * 8)
         var idx = 0
@@ -24,8 +27,13 @@ class Simulation(
             runBlocking {
                 (1..threads).map { i ->
                     GlobalScope.async(Dispatchers.IO) {
-                        val g = Grid(lattice, iters, probability)
-                        g.run_sim2_2D()
+                        val g = WallGrid(
+                                lattice = lattice as SquarePlanarWallLattice,
+                                Iterations = iters,
+                                wallType = WallType.LINEAR_HORIZONTAL_6,
+                                pb = probability
+                        )
+                        g.run_sim2D()
                         g.list
                     }
                 }.forEach {
