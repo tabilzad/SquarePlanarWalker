@@ -37,9 +37,18 @@ class Particle2D : Particle {
         y = Math.floorMod(y, m)
     }
 
+    fun moduloX(m: Int) {
+        x = Math.floorMod(x, m)
+    }
+    fun moduloY(m: Int) {
+        y = Math.floorMod(y, m)
+    }
+
     fun equals(x: Int, y: Int, z: Int): Boolean = this.x == x && this.y == y
 
     fun equals(p: Particle2D): Boolean = this.x == p.x && this.y == p.y
+
+    fun equals(p: Particle3D): Boolean = this.x == p.x && this.y == p.y && p.z == 0
 
     private fun jumpTo(p: Particle2D) {
         this.x = p.x
@@ -48,6 +57,7 @@ class Particle2D : Particle {
 
     override fun step() {
         previous.jumpTo(this)
+
         if (!stopped) {
             val r = ThreadLocalRandom.current().nextInt(100)
             when {

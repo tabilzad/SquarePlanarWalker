@@ -8,13 +8,14 @@ enum class SquarePlanarLattice(override val centerPoint: Int,
                                override val trap2: Int = 0
 ) : Lattice {
     Square_3(3),
+    Square_4(4),
     Square_5(5),
+    Square_6(6),
     Square_7(7),
     Square_9(9),
+    Square_10(10),
     Square_11(11);
-    //Square_13(13),
-    //  Square_15(15),
-    // Square_17(17);
+
 
     fun from(value: String): SquarePlanarLattice {
         return values().find { it.name.contains(value) }
