@@ -40,7 +40,7 @@ class WallGrid(
 
             while (true) {
                 //   p.show()
-                if (p.equals(trap) && prob(pb)) {
+                if (p.equals(trap)) {
                     break
                 }
 
@@ -98,10 +98,8 @@ class WallGrid(
             val walls = wall.points
             val p = Particle2D(lattice.centerPoint)
             val p2 = Particle2D(lattice.centerPoint)
-
             p.randomize(lattice.centerPoint)
             p2.randomize(lattice.centerPoint)
-
             while (p.equals(p2) || walls.any { it.equals(p) || it.equals(p2) }) {
                 when {
                     p.equals(p2) -> p.randomize(lattice.centerPoint)
@@ -115,10 +113,8 @@ class WallGrid(
                 val old_P = Particle2D(p.x, p.y)
                 val old_P2 = Particle2D(p2.x, p2.y)
 
-                p.step()
-                p.modulo(lattice.centerPoint)
-                p2.step()
-                p2.modulo(lattice.centerPoint)
+                p.step(period = lattice.centerPoint)
+                p2.step(period = lattice.centerPoint)
 
                 st++
                 if (walls.any { it.equals(p) }) {
@@ -132,7 +128,6 @@ class WallGrid(
                 if (p2.equals(old_P) && p.equals(old_P2)) {
                     break
                 }
-
             }
             // println("Exited")
             list[iteration] = st
@@ -169,10 +164,8 @@ class WallGrid(
                   val old_P = Particle2D(p.x, p.y)
                   val old_P2 = Particle2D(p2.x, p2.y)
 
-                p.step()
-                p.modulo(lattice.centerPoint)
-                p2.step()
-                p2.modulo(lattice.centerPoint)
+                p.step(lattice.centerPoint)
+                p2.step(lattice.centerPoint)
 
                 st++
                 if (walls.any { it.equals(p) }) {
